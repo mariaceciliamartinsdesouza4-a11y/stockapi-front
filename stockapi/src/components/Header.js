@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import styles from "./Header.module.css";
 
 export default function Header() {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -15,36 +16,35 @@ export default function Header() {
   }
 
   return (
-    <header className="header">
-      <Link href="/" className="logo" onClick={fecharMenu}>
+    <header className={styles.header}>
+      <Link href="/" className={styles.logo} onClick={fecharMenu}>
         Controle de Estoque
       </Link>
 
-      <button className="menu-btn" onClick={alternarMenu} aria-label="Abrir menu">
+      <button className={styles.menuBtn} onClick={alternarMenu} aria-label="Abrir menu">
         {menuAberto ? "✕" : "☰"}
       </button>
 
-      <nav className={`nav-links ${menuAberto ? "aberto" : ""}`}>
-        <Link href="/" className="nav-link" onClick={fecharMenu}>
+      <nav className={`${styles.navLinks} ${menuAberto ? styles.aberto : ""}`} aria-label="Menu de navegação">
+        <Link href="/" className={styles.navLink} onClick={fecharMenu}>
           Início
         </Link>
-        <Link href="/categorias" className="nav-link" onClick={fecharMenu}>
+        <Link href="/categorias" className={styles.navLink} onClick={fecharMenu}>
           Categorias
         </Link>
-        <Link href="/produtos" className="nav-link" onClick={fecharMenu}>
+        <Link href="/produtos" className={styles.navLink} onClick={fecharMenu}>
           Produtos
         </Link>
-        <Link href="/clientes" className="nav-link" onClick={fecharMenu}>
+        <Link href="/clientes" className={styles.navLink} onClick={fecharMenu}>
           Clientes
         </Link>
-        <Link href="/pedidos" className="nav-link" onClick={fecharMenu}>
-          Listar Pedidos
+        <Link href="/pedidos" className={styles.navLink} onClick={fecharMenu}>
+          Pedidos
         </Link>
-        <Link href="/pedidos/criar" className="nav-link" onClick={fecharMenu}>
+        <Link href="/pedidos/criar" className={styles.navLink} onClick={fecharMenu}>
           Criar Pedido
         </Link>
       </nav>
     </header>
   );
 }
-

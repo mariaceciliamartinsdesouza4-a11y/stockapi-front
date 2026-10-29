@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import styles from "./page.module.css";
 
 export default function ListarPedidos() {
   const [pedidos, setPedidos] = useState([]);
@@ -71,32 +72,35 @@ export default function ListarPedidos() {
 
   return (
     <div>
-      <div className="card">
-        <div className="acoes-topo">
-          <h1>Listar Pedidos</h1>
-          <Link href="/pedidos/criar" className="btn">
+      <div className={styles.card}>
+        <div className={styles.acoesTopo}>
+          <div>
+            <h1>Listar Pedidos</h1>
+            <p className={styles.subtitulo}>Tabela de todos os pedidos cadastrados</p>
+          </div>
+          <Link href="/pedidos/criar" className={styles.btn}>
             + Criar Novo Pedido
           </Link>
         </div>
 
         {carregando && <p>Carregando pedidos...</p>}
 
-        {erro && <div className="alerta-erro">{erro}</div>}
+        {erro && <div className={styles.alertaErro}>{erro}</div>}
 
         {!carregando && !erro && pedidos.length === 0 && (
           <p>Nenhum pedido cadastrado no momento.</p>
         )}
 
         {!carregando && !erro && pedidos.length > 0 && (
-          <div className="tabela-container">
-            <table className="tabela">
+          <div className={styles.tabelaContainer}>
+            <table className={styles.tabela}>
               <thead>
                 <tr>
                   <th>Nº</th>
                   <th>Cliente</th>
                   <th>Data</th>
                   <th>Status</th>
-                  <th>Itens do Pedido (Produto e Quantidade)</th>
+                  <th>Itens do Pedido (Lista de Produtos e Quantidades)</th>
                 </tr>
               </thead>
               <tbody>
@@ -108,18 +112,18 @@ export default function ListarPedidos() {
                       <td>{obterNomeCliente(pedido.cliente_id)}</td>
                       <td>{formatarData(pedido.data_pedido)}</td>
                       <td>
-                        <span className="badge">{pedido.status}</span>
+                        <span className={styles.badge}>{pedido.status}</span>
                       </td>
                       <td>
                         {itens.length === 0 ? (
                           <span>Sem itens</span>
                         ) : (
-                          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                          <div className={styles.itensLista}>
                             {itens.map((item) => (
-                              <div key={item.id} className="item-pedido-bloco">
+                              <div key={item.id} className={styles.itemBloco}>
                                 <strong>{obterNomeProduto(item.produto_id)}</strong>
                                 <div>Quantidade: {item.quantidade}</div>
-                                <div>Preço un.: R$ {Number(item.preco_unitario).toFixed(2)}</div>
+                                <div>Preço un.: R$ {Number(item.preco_unitario || 0).toFixed(2)}</div>
                               </div>
                             ))}
                           </div>
@@ -136,4 +140,3 @@ export default function ListarPedidos() {
     </div>
   );
 }
-

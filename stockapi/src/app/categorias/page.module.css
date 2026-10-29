@@ -1,0 +1,74 @@
+.card {
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.acoesTopo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.subtitulo {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.btnSecundario {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #64748b;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btnSecundario:hover {
+  background-color: #475569;
+}
+
+.alertaErro {
+  padding: 10px;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.tabelaContainer {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 15px;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+.tabela th,
+.tabela td {
+  border: 1px solid #cccccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.tabela th {
+  background-color: #e2e8f0;
+}
+
+.tabela tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import styles from "./page.module.css";
 
 export default function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -29,24 +30,27 @@ export default function Categorias() {
   }, []);
 
   return (
-    <div className="card">
-      <div className="acoes-topo">
-        <h1>Categorias</h1>
-        <Link href="/" className="btn btn-secundario">
+    <div className={styles.card}>
+      <div className={styles.acoesTopo}>
+        <div>
+          <h1>Categorias</h1>
+          <p className={styles.subtitulo}>Tabela de todas as categorias cadastradas</p>
+        </div>
+        <Link href="/" className={styles.btnSecundario}>
           Voltar ao Início
         </Link>
       </div>
 
       {carregando && <p>Carregando categorias...</p>}
-      {erro && <div className="alerta-erro">{erro}</div>}
+      {erro && <div className={styles.alertaErro}>{erro}</div>}
 
       {!carregando && !erro && categorias.length === 0 && (
         <p>Nenhuma categoria encontrada.</p>
       )}
 
       {!carregando && !erro && categorias.length > 0 && (
-        <div className="tabela-container">
-          <table className="tabela">
+        <div className={styles.tabelaContainer}>
+          <table className={styles.tabela}>
             <thead>
               <tr>
                 <th>ID</th>
@@ -67,4 +71,3 @@ export default function Categorias() {
     </div>
   );
 }
-

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import styles from "./page.module.css";
 
 export default function Produtos() {
   const [produtos, setProdutos] = useState([]);
@@ -43,24 +44,27 @@ export default function Produtos() {
   }
 
   return (
-    <div className="card">
-      <div className="acoes-topo">
-        <h1>Produtos</h1>
-        <Link href="/" className="btn btn-secundario">
+    <div className={styles.card}>
+      <div className={styles.acoesTopo}>
+        <div>
+          <h1>Produtos</h1>
+          <p className={styles.subtitulo}>Tabela de todos os produtos cadastrados</p>
+        </div>
+        <Link href="/" className={styles.btnSecundario}>
           Voltar ao Início
         </Link>
       </div>
 
       {carregando && <p>Carregando produtos...</p>}
-      {erro && <div className="alerta-erro">{erro}</div>}
+      {erro && <div className={styles.alertaErro}>{erro}</div>}
 
       {!carregando && !erro && produtos.length === 0 && (
         <p>Nenhum produto encontrado.</p>
       )}
 
       {!carregando && !erro && produtos.length > 0 && (
-        <div className="tabela-container">
-          <table className="tabela">
+        <div className={styles.tabelaContainer}>
+          <table className={styles.tabela}>
             <thead>
               <tr>
                 <th>ID</th>
@@ -77,7 +81,7 @@ export default function Produtos() {
                   <td>#{prod.id}</td>
                   <td>{prod.nome}</td>
                   <td>{prod.descricao || "-"}</td>
-                  <td>R$ {Number(prod.preco).toFixed(2)}</td>
+                  <td>R$ {Number(prod.preco || 0).toFixed(2)}</td>
                   <td>{prod.quantidade_estoque}</td>
                   <td>{obterNomeCategoria(prod.categoria_id)}</td>
                 </tr>
@@ -89,4 +93,3 @@ export default function Produtos() {
     </div>
   );
 }
-

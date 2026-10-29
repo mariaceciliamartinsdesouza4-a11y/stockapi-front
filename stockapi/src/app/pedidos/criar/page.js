@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import styles from "./page.module.css";
 
 export default function CriarPedido() {
   const [clientes, setClientes] = useState([]);
@@ -140,23 +141,26 @@ export default function CriarPedido() {
 
   return (
     <div>
-      <div className="card">
-        <div className="acoes-topo">
-          <h1>Criar Pedido</h1>
-          <Link href="/pedidos" className="btn btn-secundario">
-            Voltar para Pedidos
+      <div className={styles.card}>
+        <div className={styles.acoesTopo}>
+          <div>
+            <h1>Criar Pedido</h1>
+            <p className={styles.subtitulo}>Formulário de cadastro de novo pedido</p>
+          </div>
+          <Link href="/pedidos" className={styles.btnSecundario}>
+            Ir para Pedidos
           </Link>
         </div>
 
-        {mensagemSucesso && <div className="alerta-sucesso">{mensagemSucesso}</div>}
-        {mensagemErro && <div className="alerta-erro">{mensagemErro}</div>}
+        {mensagemSucesso && <div className={styles.alertaSucesso}>{mensagemSucesso}</div>}
+        {mensagemErro && <div className={styles.alertaErro}>{mensagemErro}</div>}
 
         {carregandoDados ? (
           <p>Carregando dados da loja...</p>
         ) : (
           <div>
             <form onSubmit={salvarPedido}>
-              <div className="campo">
+              <div className={styles.campo}>
                 <label htmlFor="cliente">Cliente *</label>
                 <select
                   id="cliente"
@@ -173,7 +177,7 @@ export default function CriarPedido() {
                 </select>
               </div>
 
-              <div className="campo">
+              <div className={styles.campo}>
                 <label htmlFor="status">Status do Pedido</label>
                 <select
                   id="status"
@@ -187,10 +191,11 @@ export default function CriarPedido() {
                 </select>
               </div>
 
-              <div className="card" style={{ marginTop: "20px", background: "#f8fafc" }}>
+              <div className={styles.cardInterno}>
                 <h2>Adicionar Produtos ao Pedido</h2>
+                <p className={styles.subtitulo}>Formulário para inclusão de itens no pedido</p>
 
-                <div className="campo">
+                <div className={styles.campo}>
                   <label htmlFor="produto">Produto</label>
                   <select
                     id="produto"
@@ -200,13 +205,13 @@ export default function CriarPedido() {
                     <option value="">Selecione um produto...</option>
                     {produtos.map((produto) => (
                       <option key={produto.id} value={produto.id}>
-                        {produto.nome} (R$ {Number(produto.preco).toFixed(2)})
+                        {produto.nome} (R$ {Number(produto.preco || 0).toFixed(2)})
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="campo">
+                <div className={styles.campo}>
                   <label htmlFor="quantidade">Quantidade</label>
                   <input
                     id="quantidade"
@@ -217,21 +222,22 @@ export default function CriarPedido() {
                   />
                 </div>
 
-                <button type="button" onClick={adicionarItem} className="btn">
+                <button type="button" onClick={adicionarItem} className={styles.btn}>
                   + Adicionar Item ao Pedido
                 </button>
               </div>
 
-              <div style={{ marginTop: "20px" }}>
+              <div className={styles.secaoLista}>
                 <h2>Produtos no Pedido Atual ({itens.length})</h2>
+                <p className={styles.subtitulo}>Tabela de itens adicionados ao pedido atual</p>
 
                 {itens.length === 0 ? (
-                  <p style={{ marginTop: "10px", color: "#666" }}>
+                  <p className={styles.textoVazio}>
                     Nenhum produto adicionado ainda. Adicione pelo menos um produto acima.
                   </p>
                 ) : (
-                  <div className="tabela-container">
-                    <table className="tabela">
+                  <div className={styles.tabelaContainer}>
+                    <table className={styles.tabela}>
                       <thead>
                         <tr>
                           <th>Produto</th>
@@ -252,7 +258,7 @@ export default function CriarPedido() {
                               <button
                                 type="button"
                                 onClick={() => removerItem(index)}
-                                className="btn btn-perigo"
+                                className={styles.btnPerigo}
                               >
                                 Remover
                               </button>
@@ -265,12 +271,11 @@ export default function CriarPedido() {
                 )}
               </div>
 
-              <div style={{ marginTop: "25px" }}>
+              <div className={styles.blocoFinal}>
                 <button
                   type="submit"
-                  className="btn"
+                  className={styles.btnSalvar}
                   disabled={salvando}
-                  style={{ width: "100%", padding: "12px", fontSize: "16px" }}
                 >
                   {salvando ? "Salvando Pedido..." : "Finalizar e Salvar Pedido"}
                 </button>
@@ -282,4 +287,3 @@ export default function CriarPedido() {
     </div>
   );
 }
-

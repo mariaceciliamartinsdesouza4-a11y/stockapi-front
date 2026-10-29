@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import styles from "./page.module.css";
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
@@ -29,24 +30,27 @@ export default function Clientes() {
   }, []);
 
   return (
-    <div className="card">
-      <div className="acoes-topo">
-        <h1>Clientes</h1>
-        <Link href="/" className="btn btn-secundario">
+    <div className={styles.card}>
+      <div className={styles.acoesTopo}>
+        <div>
+          <h1>Clientes</h1>
+          <p className={styles.subtitulo}>Tabela de todos os clientes cadastrados</p>
+        </div>
+        <Link href="/" className={styles.btnSecundario}>
           Voltar ao Início
         </Link>
       </div>
 
       {carregando && <p>Carregando clientes...</p>}
-      {erro && <div className="alerta-erro">{erro}</div>}
+      {erro && <div className={styles.alertaErro}>{erro}</div>}
 
       {!carregando && !erro && clientes.length === 0 && (
         <p>Nenhum cliente cadastrado.</p>
       )}
 
       {!carregando && !erro && clientes.length > 0 && (
-        <div className="tabela-container">
-          <table className="tabela">
+        <div className={styles.tabelaContainer}>
+          <table className={styles.tabela}>
             <thead>
               <tr>
                 <th>ID</th>
@@ -71,4 +75,3 @@ export default function Clientes() {
     </div>
   );
 }
-
