@@ -1,0 +1,12 @@
+{
+  "name": "stockapi-front",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix stockapi run dev",
+    "build": "npm --prefix stockapi run build",
+    "start": "npm --prefix stockapi run start",
+    "lint": "npm --prefix stockapi run lint"
+  }
+}
+
