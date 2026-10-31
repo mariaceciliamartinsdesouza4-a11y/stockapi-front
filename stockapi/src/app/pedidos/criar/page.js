@@ -117,7 +117,7 @@ export default function CriarPedido() {
       const pedidoCriado = await resPedido.json();
 
       for (const item of itens) {
-        await fetch("https://stock.dev.vilhena.ifro.edu.br/api/itens_pedido", {
+        const resItem = await fetch("https://stock.dev.vilhena.ifro.edu.br/api/itens_pedido", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -127,6 +127,10 @@ export default function CriarPedido() {
             preco_unitario: Number(item.preco_unitario)
           })
         });
+
+        if (!resItem.ok) {
+          throw new Error("Erro ao salvar item do pedido na API.");
+        }
       }
 
       setMensagemSucesso(`Pedido #${pedidoCriado.id} criado com sucesso com ${itens.length} produto(s)!`);

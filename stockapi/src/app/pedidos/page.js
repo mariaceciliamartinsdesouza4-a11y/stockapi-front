@@ -49,18 +49,18 @@ export default function ListarPedidos() {
   }, []);
 
   function obterNomeCliente(clienteId) {
-    const cliente = clientes.find((c) => c.id === clienteId);
+    const cliente = clientes.find((c) => String(c.id) === String(clienteId));
     return cliente ? cliente.nome : `Cliente #${clienteId}`;
   }
 
   function obterNomeProduto(produtoId) {
-    const produto = produtos.find((p) => p.id === produtoId);
+    const produto = produtos.find((p) => String(p.id) === String(produtoId));
     return produto ? produto.nome : `Produto #${produtoId}`;
   }
 
   function obterItensDoPedido(pedidoId) {
     return itensPedido.filter(
-      (item) => item.pedido_numero === pedidoId || item.pedido_id === pedidoId
+      (item) => String(item.pedido_numero) === String(pedidoId) || String(item.pedido_id) === String(pedidoId)
     );
   }
 
