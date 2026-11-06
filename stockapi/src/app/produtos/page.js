@@ -9,14 +9,42 @@ export default function Produtos() {
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [filtroCategoria, setFiltroCategoria] = useState("todas");
+  const [busca, setBusca] = useState("");
+
+  async function buscarProdutos() {
+    try {
+      setCarregando(true);
+      setErro("");
+      const [resProdutos, resCategorias] = await Promise.all([
+        fetch("https://stock.dev.vilhena.ifro.edu.br/api/produtos", { cache: "no-store" }),
+        fetch("https://stock.dev.vilhena.ifro.edu.br/api/categorias", { cache: "no-store" })
+      ]);
+
+      if (!resProdutos.ok || !resCategorias.ok) {
+        throw new Error("Erro na resposta da API");
+      }
+
+      const dadosProdutos = await resProdutos.json();
+      const dadosCategorias = await resCategorias.json();
+
+      setProdutos(Array.isArray(dadosProdutos) ? dadosProdutos : []);
+      setCategorias(Array.isArray(dadosCategorias) ? dadosCategorias : []);
+    } catch (e) {
+      setErro("Não foi possível carregar os produtos. Verifique sua conexão.");
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   useEffect(() => {
-    async function carregarProdutos() {
+    let ativo = true;
+
+    async function carregarInicial() {
       try {
-        setCarregando(true);
         const [resProdutos, resCategorias] = await Promise.all([
-          fetch("https://stock.dev.vilhena.ifro.edu.br/api/produtos"),
-          fetch("https://stock.dev.vilhena.ifro.edu.br/api/categorias")
+          fetch("https://stock.dev.vilhena.ifro.edu.br/api/produtos", { cache: "no-store" }),
+          fetch("https://stock.dev.vilhena.ifro.edu.br/api/categorias", { cache: "no-store" })
         ]);
 
         if (!resProdutos.ok || !resCategorias.ok) {
@@ -26,43 +54,122 @@ export default function Produtos() {
         const dadosProdutos = await resProdutos.json();
         const dadosCategorias = await resCategorias.json();
 
-        setProdutos(Array.isArray(dadosProdutos) ? dadosProdutos : []);
-        setCategorias(Array.isArray(dadosCategorias) ? dadosCategorias : []);
+        if (ativo) {
+          setProdutos(Array.isArray(dadosProdutos) ? dadosProdutos : []);
+          setCategorias(Array.isArray(dadosCategorias) ? dadosCategorias : []);
+        }
       } catch (e) {
-        setErro("Não foi possível carregar os produtos.");
+        if (ativo) {
+          setErro("Não foi possível carregar os produtos. Verifique sua conexão.");
+        }
       } finally {
-        setCarregando(false);
+        if (ativo) {
+          setCarregando(false);
+        }
       }
     }
 
-    carregarProdutos();
+    carregarInicial();
+
+    return () => {
+      ativo = false;
+    };
   }, []);
 
   function obterNomeCategoria(categoriaId) {
-    const cat = categorias.find((c) => c.id === categoriaId);
+    const cat = categorias.find((c) => String(c.id) === String(categoriaId));
     return cat ? cat.nome : "-";
   }
+
+  const produtosFiltrados = produtos.filter((prod) => {
+    const bateuCategoria =
+      filtroCategoria === "todas" || String(prod.categoria_id) === String(filtroCategoria);
+    const termoBusca = busca.toLowerCase().trim();
+    const bateuBusca =
+      !termoBusca ||
+      String(prod.nome || "").toLowerCase().includes(termoBusca) ||
+      String(prod.descricao || "").toLowerCase().includes(termoBusca);
+
+    return bateuCategoria && bateuBusca;
+  });
 
   return (
     <div className={styles.card}>
       <div className={styles.acoesTopo}>
         <div>
           <h1>Produtos</h1>
-          <p className={styles.subtitulo}>Tabela de todos os produtos cadastrados</p>
+          <p className={styles.subtitulo}>
+            Tabela de todos os produtos cadastrados na API
+          </p>
         </div>
-        <Link href="/" className={styles.btnSecundario}>
-          Voltar ao Início
-        </Link>
+        <div className={styles.botoesTopo}>
+          <button
+            type="button"
+            onClick={buscarProdutos}
+            className={styles.btnSecundario}
+            disabled={carregando}
+            title="Recarregar produtos"
+          >
+            ↻ Atualizar
+          </button>
+          <Link href="/" className={styles.btnVoltar}>
+            Voltar ao Início
+          </Link>
+        </div>
       </div>
 
-      {carregando && <p>Carregando produtos...</p>}
-      {erro && <div className={styles.alertaErro}>{erro}</div>}
+      {/* Barra de Filtros e Busca */}
+      <div className={styles.barraFiltros}>
+        <div className={styles.filtroItem}>
+          <label htmlFor="busca">Buscar Produto:</label>
+          <input
+            id="busca"
+            type="text"
+            placeholder="Digite o nome..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className={styles.inputBusca}
+          />
+        </div>
 
-      {!carregando && !erro && produtos.length === 0 && (
-        <p>Nenhum produto encontrado.</p>
+        <div className={styles.filtroItem}>
+          <label htmlFor="filtroCategoria">Categoria:</label>
+          <select
+            id="filtroCategoria"
+            value={filtroCategoria}
+            onChange={(e) => setFiltroCategoria(e.target.value)}
+            className={styles.selectFiltro}
+          >
+            <option value="todas">Todas ({produtos.length})</option>
+            {categorias.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.nome}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {carregando && <p className={styles.avisoCarregando}>Carregando produtos da API...</p>}
+
+      {erro && (
+        <div className={styles.alertaErro}>
+          <p>{erro}</p>
+          <button type="button" onClick={buscarProdutos} className={styles.btnTentar}>
+            Tentar Novamente
+          </button>
+        </div>
       )}
 
-      {!carregando && !erro && produtos.length > 0 && (
+      {!carregando && !erro && produtos.length === 0 && (
+        <p className={styles.avisoVazio}>Nenhum produto encontrado na API.</p>
+      )}
+
+      {!carregando && !erro && produtos.length > 0 && produtosFiltrados.length === 0 && (
+        <p className={styles.avisoVazio}>Nenhum produto corresponde aos filtros aplicados.</p>
+      )}
+
+      {!carregando && !erro && produtosFiltrados.length > 0 && (
         <div className={styles.tabelaContainer}>
           <table className={styles.tabela}>
             <thead>
@@ -76,14 +183,34 @@ export default function Produtos() {
               </tr>
             </thead>
             <tbody>
-              {produtos.map((prod) => (
+              {produtosFiltrados.map((prod) => (
                 <tr key={prod.id}>
-                  <td>#{prod.id}</td>
-                  <td>{prod.nome}</td>
-                  <td>{prod.descricao || "-"}</td>
-                  <td>R$ {Number(prod.preco || 0).toFixed(2)}</td>
-                  <td>{prod.quantidade_estoque}</td>
-                  <td>{obterNomeCategoria(prod.categoria_id)}</td>
+                  <td>
+                    <strong>#{prod.id}</strong>
+                  </td>
+                  <td>
+                    <strong>{prod.nome}</strong>
+                  </td>
+                  <td className={styles.colunaDescricao}>{prod.descricao || "-"}</td>
+                  <td className={styles.colunaPreco}>
+                    R$ {Number(prod.preco || 0).toFixed(2)}
+                  </td>
+                  <td>
+                    <span
+                      className={
+                        prod.quantidade_estoque > 0
+                          ? styles.estoqueOk
+                          : styles.estoqueZerado
+                      }
+                    >
+                      {prod.quantidade_estoque} un.
+                    </span>
+                  </td>
+                  <td>
+                    <span className={styles.badgeCategoria}>
+                      {obterNomeCategoria(prod.categoria_id)}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

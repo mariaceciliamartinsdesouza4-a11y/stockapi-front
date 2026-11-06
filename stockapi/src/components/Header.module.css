@@ -1,47 +1,149 @@
 .header {
   background-color: #1e293b;
   color: #ffffff;
-  padding: 15px 20px;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: bold;
   color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoIcon {
+  font-size: 20px;
 }
 
 .menuBtn {
   display: none;
   background: none;
-  border: none;
+  border: 1px solid #334155;
   color: #ffffff;
-  font-size: 26px;
+  font-size: 20px;
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
   cursor: pointer;
+}
+
+.menuBtn:hover {
+  background-color: #334155;
 }
 
 .navLinks {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
 }
 
 .navLink {
-  color: #ffffff;
-  padding: 8px 12px;
-  border-radius: 4px;
-  display: inline-block;
+  color: #e2e8f0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .navLink:hover {
   background-color: #334155;
+  color: #ffffff;
 }
 
+.navLink.ativo {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Dropdown Container */
+.dropdownContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownGatilhoWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.dropdownSetaBtn {
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  padding: 8px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.dropdownSetaBtn:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+.seta {
+  font-size: 10px;
+}
+
+.dropdownMenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 180px;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 6px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 110;
+}
+
+.dropdownMenu.visivel {
+  display: block;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 9px 16px;
+  color: #e2e8f0;
+  font-size: 13px;
+  transition: background-color 0.15s ease;
+}
+
+.dropdownItem:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+.dropdownItem.itemAtivo {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ===== REQUISITOS DE RESPONSIVIDADE (guia.txt) ===== */
+
+/* Mobile: telas com largura de até 768 px */
 @media (max-width: 768px) {
   .header {
     flex-wrap: wrap;
+    padding: 12px 16px;
   }
 
   .menuBtn {
@@ -52,8 +154,11 @@
     display: none;
     flex-direction: column;
     width: 100%;
-    margin-top: 10px;
-    align-items: flex-start;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #334155;
+    align-items: stretch;
+    gap: 4px;
   }
 
   .navLinks.aberto {
@@ -62,11 +167,53 @@
 
   .navLink {
     width: 100%;
-    padding: 10px;
-    border-bottom: 1px solid #334155;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 6px;
+  }
+
+  .dropdownContainer {
+    width: 100%;
+    display: block;
+  }
+
+  .dropdownGatilhoWrapper {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dropdownGatilhoWrapper .navLink {
+    flex: 1;
+  }
+
+  .dropdownSetaBtn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .dropdownMenu {
+    position: static;
+    display: none;
+    background-color: #0f172a;
+    border: none;
+    border-radius: 6px;
+    margin: 4px 0 8px 12px;
+    padding: 4px 0;
+    box-shadow: none;
+  }
+
+  .dropdownMenu.visivel {
+    display: block;
+  }
+
+  .dropdownItem {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 4px;
   }
 }
 
+/* Desktop: telas com largura a partir de 769 px */
 @media (min-width: 769px) {
   .menuBtn {
     display: none;
@@ -75,5 +222,8 @@
   .navLinks {
     display: flex;
   }
-}
 
+  .dropdownContainer:hover .dropdownMenu {
+    display: block;
+  }
+}

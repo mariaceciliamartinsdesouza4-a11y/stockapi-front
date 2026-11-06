@@ -8,47 +8,124 @@ export default function Categorias() {
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [busca, setBusca] = useState("");
+
+  async function buscarCategorias() {
+    try {
+      setCarregando(true);
+      setErro("");
+      const res = await fetch("https://stock.dev.vilhena.ifro.edu.br/api/categorias", {
+        cache: "no-store"
+      });
+      if (!res.ok) {
+        throw new Error("Erro na resposta da API");
+      }
+      const dados = await res.json();
+      setCategorias(Array.isArray(dados) ? dados : []);
+    } catch (e) {
+      setErro("Não foi possível carregar as categorias. Verifique sua conexão.");
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   useEffect(() => {
-    async function carregarCategorias() {
+    let ativo = true;
+
+    async function carregarInicial() {
       try {
-        setCarregando(true);
-        const res = await fetch("https://stock.dev.vilhena.ifro.edu.br/api/categorias");
+        const res = await fetch("https://stock.dev.vilhena.ifro.edu.br/api/categorias", {
+          cache: "no-store"
+        });
         if (!res.ok) {
           throw new Error("Erro na resposta da API");
         }
         const dados = await res.json();
-        setCategorias(Array.isArray(dados) ? dados : []);
+        if (ativo) {
+          setCategorias(Array.isArray(dados) ? dados : []);
+        }
       } catch (e) {
-        setErro("Não foi possível carregar as categorias.");
+        if (ativo) {
+          setErro("Não foi possível carregar as categorias. Verifique sua conexão.");
+        }
       } finally {
-        setCarregando(false);
+        if (ativo) {
+          setCarregando(false);
+        }
       }
     }
 
-    carregarCategorias();
+    carregarInicial();
+
+    return () => {
+      ativo = false;
+    };
   }, []);
+
+  const categoriasFiltradas = categorias.filter((cat) => {
+    const termo = busca.toLowerCase().trim();
+    if (!termo) return true;
+    return String(cat.nome || "").toLowerCase().includes(termo);
+  });
 
   return (
     <div className={styles.card}>
       <div className={styles.acoesTopo}>
         <div>
           <h1>Categorias</h1>
-          <p className={styles.subtitulo}>Tabela de todas as categorias cadastradas</p>
+          <p className={styles.subtitulo}>
+            Tabela de todas as categorias cadastradas na API
+          </p>
         </div>
-        <Link href="/" className={styles.btnSecundario}>
-          Voltar ao Início
-        </Link>
+        <div className={styles.botoesTopo}>
+          <button
+            type="button"
+            onClick={buscarCategorias}
+            className={styles.btnSecundario}
+            disabled={carregando}
+            title="Recarregar categorias"
+          >
+            ↻ Atualizar
+          </button>
+          <Link href="/" className={styles.btnVoltar}>
+            Voltar ao Início
+          </Link>
+        </div>
       </div>
 
-      {carregando && <p>Carregando categorias...</p>}
-      {erro && <div className={styles.alertaErro}>{erro}</div>}
+      {/* Barra de Busca */}
+      <div className={styles.barraFiltros}>
+        <label htmlFor="buscaCategoria">Buscar Categoria:</label>
+        <input
+          id="buscaCategoria"
+          type="text"
+          placeholder="Digite o nome da categoria..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          className={styles.inputBusca}
+        />
+      </div>
 
-      {!carregando && !erro && categorias.length === 0 && (
-        <p>Nenhuma categoria encontrada.</p>
+      {carregando && <p className={styles.avisoCarregando}>Carregando categorias da API...</p>}
+
+      {erro && (
+        <div className={styles.alertaErro}>
+          <p>{erro}</p>
+          <button type="button" onClick={buscarCategorias} className={styles.btnTentar}>
+            Tentar Novamente
+          </button>
+        </div>
       )}
 
-      {!carregando && !erro && categorias.length > 0 && (
+      {!carregando && !erro && categorias.length === 0 && (
+        <p className={styles.avisoVazio}>Nenhuma categoria encontrada.</p>
+      )}
+
+      {!carregando && !erro && categorias.length > 0 && categoriasFiltradas.length === 0 && (
+        <p className={styles.avisoVazio}>Nenhuma categoria encontrada para &quot;{busca}&quot;.</p>
+      )}
+
+      {!carregando && !erro && categoriasFiltradas.length > 0 && (
         <div className={styles.tabelaContainer}>
           <table className={styles.tabela}>
             <thead>
@@ -58,10 +135,14 @@ export default function Categorias() {
               </tr>
             </thead>
             <tbody>
-              {categorias.map((cat) => (
+              {categoriasFiltradas.map((cat) => (
                 <tr key={cat.id}>
-                  <td>#{cat.id}</td>
-                  <td>{cat.nome}</td>
+                  <td>
+                    <strong>#{cat.id}</strong>
+                  </td>
+                  <td>
+                    <strong>{cat.nome}</strong>
+                  </td>
                 </tr>
               ))}
             </tbody>

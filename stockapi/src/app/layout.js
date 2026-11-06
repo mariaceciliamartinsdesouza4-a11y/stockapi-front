@@ -1,6 +1,7 @@
 import "./globals.css";
 import styles from "./layout.module.css";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 export const metadata = {
   title: "Controle de Estoque",
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
         <main className={styles.container}>
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );

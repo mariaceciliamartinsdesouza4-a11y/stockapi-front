@@ -8,47 +8,128 @@ export default function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
+  const [busca, setBusca] = useState("");
+
+  async function buscarClientes() {
+    try {
+      setCarregando(true);
+      setErro("");
+      const res = await fetch("https://stock.dev.vilhena.ifro.edu.br/api/clientes", {
+        cache: "no-store"
+      });
+      if (!res.ok) {
+        throw new Error("Erro na resposta da API");
+      }
+      const dados = await res.json();
+      setClientes(Array.isArray(dados) ? dados : []);
+    } catch (e) {
+      setErro("Não foi possível carregar os clientes. Verifique sua conexão.");
+    } finally {
+      setCarregando(false);
+    }
+  }
 
   useEffect(() => {
-    async function carregarClientes() {
+    let ativo = true;
+
+    async function carregarInicial() {
       try {
-        setCarregando(true);
-        const res = await fetch("https://stock.dev.vilhena.ifro.edu.br/api/clientes");
+        const res = await fetch("https://stock.dev.vilhena.ifro.edu.br/api/clientes", {
+          cache: "no-store"
+        });
         if (!res.ok) {
           throw new Error("Erro na resposta da API");
         }
         const dados = await res.json();
-        setClientes(Array.isArray(dados) ? dados : []);
+        if (ativo) {
+          setClientes(Array.isArray(dados) ? dados : []);
+        }
       } catch (e) {
-        setErro("Não foi possível carregar os clientes.");
+        if (ativo) {
+          setErro("Não foi possível carregar os clientes. Verifique sua conexão.");
+        }
       } finally {
-        setCarregando(false);
+        if (ativo) {
+          setCarregando(false);
+        }
       }
     }
 
-    carregarClientes();
+    carregarInicial();
+
+    return () => {
+      ativo = false;
+    };
   }, []);
+
+  const clientesFiltrados = clientes.filter((cli) => {
+    const termo = busca.toLowerCase().trim();
+    if (!termo) return true;
+    return (
+      String(cli.nome || "").toLowerCase().includes(termo) ||
+      String(cli.email || "").toLowerCase().includes(termo) ||
+      String(cli.telefone || "").toLowerCase().includes(termo)
+    );
+  });
 
   return (
     <div className={styles.card}>
       <div className={styles.acoesTopo}>
         <div>
           <h1>Clientes</h1>
-          <p className={styles.subtitulo}>Tabela de todos os clientes cadastrados</p>
+          <p className={styles.subtitulo}>
+            Tabela de todos os clientes cadastrados na API
+          </p>
         </div>
-        <Link href="/" className={styles.btnSecundario}>
-          Voltar ao Início
-        </Link>
+        <div className={styles.botoesTopo}>
+          <button
+            type="button"
+            onClick={buscarClientes}
+            className={styles.btnSecundario}
+            disabled={carregando}
+            title="Recarregar clientes"
+          >
+            ↻ Atualizar
+          </button>
+          <Link href="/" className={styles.btnVoltar}>
+            Voltar ao Início
+          </Link>
+        </div>
       </div>
 
-      {carregando && <p>Carregando clientes...</p>}
-      {erro && <div className={styles.alertaErro}>{erro}</div>}
+      {/* Barra de Busca */}
+      <div className={styles.barraFiltros}>
+        <label htmlFor="buscaCliente">Buscar Cliente:</label>
+        <input
+          id="buscaCliente"
+          type="text"
+          placeholder="Digite o nome, e-mail ou telefone..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          className={styles.inputBusca}
+        />
+      </div>
 
-      {!carregando && !erro && clientes.length === 0 && (
-        <p>Nenhum cliente cadastrado.</p>
+      {carregando && <p className={styles.avisoCarregando}>Carregando clientes da API...</p>}
+
+      {erro && (
+        <div className={styles.alertaErro}>
+          <p>{erro}</p>
+          <button type="button" onClick={buscarClientes} className={styles.btnTentar}>
+            Tentar Novamente
+          </button>
+        </div>
       )}
 
-      {!carregando && !erro && clientes.length > 0 && (
+      {!carregando && !erro && clientes.length === 0 && (
+        <p className={styles.avisoVazio}>Nenhum cliente cadastrado.</p>
+      )}
+
+      {!carregando && !erro && clientes.length > 0 && clientesFiltrados.length === 0 && (
+        <p className={styles.avisoVazio}>Nenhum cliente encontrado para &quot;{busca}&quot;.</p>
+      )}
+
+      {!carregando && !erro && clientesFiltrados.length > 0 && (
         <div className={styles.tabelaContainer}>
           <table className={styles.tabela}>
             <thead>
@@ -60,10 +141,14 @@ export default function Clientes() {
               </tr>
             </thead>
             <tbody>
-              {clientes.map((cli) => (
+              {clientesFiltrados.map((cli) => (
                 <tr key={cli.id}>
-                  <td>#{cli.id}</td>
-                  <td>{cli.nome}</td>
+                  <td>
+                    <strong>#{cli.id}</strong>
+                  </td>
+                  <td>
+                    <strong>{cli.nome}</strong>
+                  </td>
                   <td>{cli.email || "-"}</td>
                   <td>{cli.telefone || "-"}</td>
                 </tr>
